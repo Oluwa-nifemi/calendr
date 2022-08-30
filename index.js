@@ -79,11 +79,6 @@ const renderDays = () => {
   })
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  rootElement.style.setProperty('--grid-per-day', String(LENGTH_OF_WORK_DAY / MINIMUM_INTERVAL))
-  renderDays()
-})
-
 //Reservation schema
 /*
 * {
@@ -98,33 +93,35 @@ document.addEventListener('DOMContentLoaded', () => {
 *
 * */
 
+const today = new Date()
+
 const reservations = [
   {
     id: '1',
     name: 'John Doe',
     numberOfGuest: 10,
-    startTime: new Date(2020, 0, 1, 10, 0),
+    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 30),
     date: new Date(2020, 0, 1),
-    duration: 60,
+    duration: 90,
     lanes: [1, 2, 3]
   },
   {
     id: '2',
     name: 'Jay jeans',
     numberOfGuest: 10,
-    startTime: new Date(2020, 0, 1, 10, 0),
+    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 30),
     date: new Date(2020, 0, 1),
-    duration: 60,
+    duration: 120,
     lanes: [4, 6, 7]
   },
   {
     id: '3',
     name: 'Jones',
     numberOfGuest: 6,
-    startTime: new Date(2020, 0, 1, 10, 0),
+    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 2, 30),
     date: new Date(2020, 0, 1),
     duration: 60,
-    lanes: [4, 6, 7]
+    lanes: [4, 5]
   },
 ]
 
@@ -132,9 +129,31 @@ const renderReservations = () => {
   const reservationsElement = document.querySelector('.calendar');
   reservationsElement.innerHTML = '';
   reservations.forEach(reservation => {
-    const reservationElement = document.createElement('div');
-    reservationElement.classList.add('reservation');
-    reservationElement.innerText = `${reservation.name} - ${reservation.numberOfGuest}`;
-    reservationsElement.append(reservationElement);
-  } )
+    reservation.lanes.forEach(lane => {
+      const reservationElement = document.createElement('div');
+      reservationElement.classList.add('reservation');
+
+      reservationElement.innerText = `${reservation.name} - ${reservation.numberOfGuest}`;
+
+      const time = new Date();
+      time.setHours(reservation.startTime);
+      time.setMinutes(0, 0, 0);
+
+      const columnStart = getColumnStart(reservation.startTime) + 1;
+      const columnSpan = reservation.duration / MINIMUM_INTERVAL;
+
+      reservationElement.style.gridColumnStart = `${columnStart}`;
+      reservationElement.style.gridColumnEnd = `span ${columnSpan}`;
+      reservationElement.style.gridRowStart = `${lane}`;
+
+      reservationsElement.append(reservationElement);
+
+    })
+  })
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  rootElement.style.setProperty('--grid-per-day', String(LENGTH_OF_WORK_DAY / MINIMUM_INTERVAL))
+  renderDays()
+  renderReservations()
+})

@@ -61,6 +61,8 @@ aside{
   position: sticky;
   left: 0;
   flex-shrink: 0;
+  z-index: 10;
+  background: white;
 }
 
 .lanes-list{
@@ -116,5 +118,11 @@ aside{
 }
 
 .reservation{
-
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  background: #F6F8FE;
+  border: 1px solid #ECEDEE;
+  border-radius: 6px;
+  place-self: center;
+  padding: 8px;
 }
