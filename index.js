@@ -97,7 +97,6 @@ const today = new Date()
 
 const reservations = [
   {
-    id: '1',
     name: 'John Doe',
     numberOfGuest: 10,
     startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 30),
@@ -106,30 +105,56 @@ const reservations = [
     lanes: [1, 2, 3]
   },
   {
-    id: '2',
     name: 'Jay jeans',
     numberOfGuest: 10,
     startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 30),
     date: new Date(2020, 0, 1),
-    duration: 120,
+    duration: 90,
     lanes: [4, 6, 7]
   },
   {
-    id: '3',
+    name: 'Joseph jeans',
+    numberOfGuest: 10,
+    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 16, 30),
+    date: new Date(2020, 0, 1),
+    duration: 180,
+    lanes: [5, 6, 7]
+  },
+  {
     name: 'Jones',
     numberOfGuest: 6,
-    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 2, 30),
+    startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 30),
     date: new Date(2020, 0, 1),
     duration: 60,
     lanes: [4, 5]
   },
-]
+].map(reservation => {
+  //group contiguous lanes
+  const lanes = reservation.lanes.reduce((acc, lane) => {
+    if(acc.length === 0) {
+      acc.push([lane]);
+    } else {
+      const last = acc[acc.length - 1];
+      if(last[last.length - 1] + 1 === lane) {
+        last.push(lane);
+      } else {
+        acc.push([lane]);
+      }
+    }
+    return acc;
+  }, [])
+
+  return {
+    ...reservation,
+    lanes
+  }
+})
 
 const renderReservations = () => {
   const reservationsElement = document.querySelector('.calendar');
   reservationsElement.innerHTML = '';
   reservations.forEach(reservation => {
-    reservation.lanes.forEach(lane => {
+    reservation.lanes.forEach(laneGroup => {
       const reservationElement = document.createElement('div');
       reservationElement.classList.add('reservation');
 
@@ -139,12 +164,14 @@ const renderReservations = () => {
       time.setHours(reservation.startTime);
       time.setMinutes(0, 0, 0);
 
-      const columnStart = getColumnStart(reservation.startTime) + 1;
+      const columnStart = getColumnStart(reservation.startTime) - 1;
       const columnSpan = reservation.duration / MINIMUM_INTERVAL;
 
       reservationElement.style.gridColumnStart = `${columnStart}`;
       reservationElement.style.gridColumnEnd = `span ${columnSpan}`;
-      reservationElement.style.gridRowStart = `${lane}`;
+
+      reservationElement.style.gridRowStart = `${laneGroup[0]}`;
+      reservationElement.style.gridRowEnd = `${laneGroup[laneGroup.length - 1] + 1}`;
 
       reservationsElement.append(reservationElement);
 
