@@ -47,7 +47,7 @@ main{
 .intervals p{
   font-size: 16px;
   color: #9BA1B0;
-  width: fit-content;
+  width: max-content;
   transform: translateX(-50%) translateY(-6px);
   position: relative;
 }
